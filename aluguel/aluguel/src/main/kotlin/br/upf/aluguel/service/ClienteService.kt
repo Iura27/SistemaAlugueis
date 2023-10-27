@@ -1,16 +1,48 @@
-import org.springframework.beans.factory.annotation.Autowired
+package br.upf.Aluguel.service
+
+import br.upf.Aluguel.converters.ClienteConverter
+import br.upf.Aluguel.dto.ClienteDTO
+import br.upf.Aluguel.dto.ClienteResponseDTO
+import br.upf.Aluguel.repository.ClienteRepository
+import br.upf.sistemaeventos.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 
+private const val CLIENTE_NOT_FOUND_MESSAGE = "Cliente não encontrado!"
+
 @Service
-class ClienteService(@Autowired val clienteRepository: ClienteRepository) {
+class ClienteService<Pageable>(private val repository: ClienteRepository,
+                               private val converter: ClienteConverter) {
 
-    fun findAll(): List<Cliente> = clienteRepository.findAll()
+    fun listar(): List<ClienteResponseDTO> {
+        return repository.findAll()
+            .map(converter::toClienteResponseDTO)
+    }
 
-    fun findById(id: Long): Cliente? = clienteRepository.findById(id).orElse(null)
+    fun buscarPorId(id: Long): ClienteResponseDTO {
+        val cliente = repository.findById(id)
+            .orElseThrow { NotFoundException(CLIENTE_NOT_FOUND_MESSAGE) }
+        return converter.toClienteResponseDTO(cliente)
+    }
 
-    fun save(cliente: Cliente): Cliente = clienteRepository.save(cliente)
+    fun cadastrar(dto: ClienteDTO): ClienteResponseDTO {
+        return converter.toClienteResponseDTO(
+            repository.save(converter.toCliente(dto))
+        )
+    }
 
-    fun deleteById(id: Long) = clienteRepository.deleteById(id)
+    fun atualizar(id: Long, dto: ClienteDTO): ClienteResponseDTO {
+        val cliente = repository.findById(id)
+            .orElseThrow { NotFoundException(CLIENTE_NOT_FOUND_MESSAGE) }
+            .copy(
+                nome = dto.nome,
+                telefone = dto.telefone,
+                endereco = dto.endereco,
+                tipoUsuario = dto.tipousuario
+            )
+        return converter.toClienteResponseDTO(repository.save(cliente))
+    }
 
-    // Adicione outros métodos conforme necessário
+    fun deletar(id: Long) {
+        repository.deleteById(id)
+    }
 }

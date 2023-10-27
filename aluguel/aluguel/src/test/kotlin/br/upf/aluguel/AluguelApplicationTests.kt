@@ -1,4 +1,4 @@
-package br.upf.aluguel
+package br.upf.Aluguel
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

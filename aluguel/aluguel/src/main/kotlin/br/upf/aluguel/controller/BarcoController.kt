@@ -1,8 +1,8 @@
 package br.upf.Aluguel.controller
 
-import br.upf.Aluguel.dto.TipoBarcoDTO
-import br.upf.Aluguel.dto.TipoBarcoResponseDTO
-import br.upf.Aluguel.service.TipoBarcoService
+import br.upf.Aluguel.dto.BarcoDTO
+import br.upf.Aluguel.dto.BarcoResponseDTO
+import br.upf.Aluguel.service.BarcoService
 import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -14,33 +14,33 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
-@RequestMapping("/tiposbarco")
-class TipoBarcoController(private val service: TipoBarcoService) {
+@RequestMapping("/barcos")
+class BarcoController(private val service: BarcoService) {
 
     @GetMapping
-    fun listar( @RequestParam(required = false) nome: String?,
+    fun listar( @RequestParam(required = false) marca: String?,
                 @PageableDefault(size = 10) paginacao: Pageable
     )
-            : Page<TipoBarcoResponseDTO> {
-        return service.listar(nome, paginacao)
+            : Page<BarcoResponseDTO> {
+        return service.listar(marca, paginacao)
     }
 
     @GetMapping("/{id}")
-    fun buscarPorId(@PathVariable id: Long): TipoBarcoResponseDTO {
+    fun buscarPorId(@PathVariable id: Long): BarcoResponseDTO {
         return service.buscarPorId(id)
     }
 
     @PostMapping
     @Transactional
-    fun cadastrar(@RequestBody @Valid dto: TipoBarcoDTO, uriBuilder: UriComponentsBuilder): ResponseEntity<TipoBarcoResponseDTO> {
-        val tipoBarcoResponse = service.cadastrar(dto)
-        val uri = uriBuilder.path("/tiposbarco/${tipoBarcoResponse.id}").build().toUri()
-        return ResponseEntity.created(uri).body(tipoBarcoResponse)
+    fun cadastrar(@RequestBody @Valid dto: BarcoDTO, uriBuilder: UriComponentsBuilder): ResponseEntity<BarcoResponseDTO> {
+        val barcoResponse = service.cadastrar(dto)
+        val uri = uriBuilder.path("/barcos/${barcoResponse.id}").build().toUri()
+        return ResponseEntity.created(uri).body(barcoResponse)
     }
 
     @PutMapping("/{id}")
     @Transactional
-    fun atualizar(@PathVariable id: Long, @RequestBody @Valid dto: TipoBarcoDTO): TipoBarcoResponseDTO {
+    fun atualizar(@PathVariable id: Long, @RequestBody @Valid dto: BarcoDTO): BarcoResponseDTO {
         return service.atualizar(id, dto)
     }
 
